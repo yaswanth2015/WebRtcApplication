@@ -1,0 +1,7 @@
+.Login {
+  position: absolute;
+  top: 40%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  padding: 10px;
+}

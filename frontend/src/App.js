@@ -1,13 +1,12 @@
 
 import './App.css';
-import Button from "./Components/Button.jsx"
+import Login from './Components/Login';
 
 
 function App() {
   return (
     <div className="App">
-      <div> This Is Yaswanth </div>
-    <Button buttonName="Login"></Button>
+      <Login />
     </div>
   );
 }
