@@ -15,10 +15,18 @@ function Login(props) {
         userDetails.setEmail("")
         userDetails.setPassword("")
    }
+   function handleUserDetails(e) {
+        if (e.target.type === "email")
+        {
+            userDetails.setEmail(e.target.value)
+        } else if (e.target.type === "password") {
+            userDetails.setPassword(e.target.value)
+        }
+   }
     return (
         <div className="Login">
-            <TextField type = "email" placeholder="User Email" value= { userDetails.email }/>
-            <TextField type = "password" placeholder = "Password" value= { userDetails.password }/>
+            <TextField type = "email" placeholder="User Email" value= { userDetails.email } onChange = {handleUserDetails}/>
+            <TextField type = "password" placeholder = "Password" value= { userDetails.password } onChange = {handleUserDetails}/>
             <Button buttonName = "Login" onClick = { handleLogin }/>
         </div>
     )
