@@ -12,8 +12,32 @@ function Login(props) {
         const userEmail = userDetails.email;
         const userPassword = userDetails.password
         //Fetch API Details and redirect
-        userDetails.setEmail("")
-        userDetails.setPassword("")
+        fetch("http://localhost:8000/login",{
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            mode: 'cors',
+            body: JSON.stringify( {
+                email: userEmail,
+                password: userPassword,
+            })
+        }).then(async (response) => {
+            console.log(response)
+            const responseBody = await response.json()
+            if (response.status == 200) {
+                alert(responseBody.message)
+            } else {
+                alert(responseBody.error)
+            }
+            userDetails.setEmail("")
+            userDetails.setPassword("")
+        }).catch((error) => {
+            console.log(error)
+            alert(`error occured ${error} status ${error.status}`)
+            userDetails.setEmail("")
+            userDetails.setPassword("")
+        })
    }
    function handleUserDetails(e) {
         if (e.target.type === "email")
