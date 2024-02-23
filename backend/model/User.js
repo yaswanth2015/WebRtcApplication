@@ -14,6 +14,11 @@ const UserSchema = new Schema({
     password: {
         required: true,
         type: String,
+    },
+    socketID: {
+        required: false,
+        type: String,
+        default: null
     }
 })
 const User = mongoose.model("user", UserSchema)
