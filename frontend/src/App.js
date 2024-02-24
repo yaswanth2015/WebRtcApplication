@@ -13,7 +13,7 @@ function App() {
         <Routes>
           <Route path='/' element = {<Login />}/>
           <Route path='/signup' element = { <SignUp /> }/>
-          <Route path="/users" element = { <UserListWithSocketProvider /> } />
+          <Route path="/:userId" element = { <UserListWithSocketProvider /> } />
           <Route path='/login' element = {<Navigate to={"/"}/>} />
         </Routes>
       </BrowserRouter>

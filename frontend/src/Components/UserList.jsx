@@ -1,8 +1,7 @@
 import React from "react";
-import { useCallback } from "react";
 import { useEffect } from "react";
 import { Component } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as Constants from '../constants/ConstantKeys'
 import { SocketProvider, useSocket } from "../context/UserLogin";
 import "../Css/UserButton.css"
@@ -55,12 +54,13 @@ class UserList extends Component {
     }
 
     render() {
-        return (
+        return (<>
             <ul>
                 {this.state.users.map((value)=>{
                     return <button className="UserButton" onClick={this.handleOnClickUser}> {value.email} </button>
                 })}
             </ul>
+            </>
         )
     }
 }
@@ -68,7 +68,7 @@ class UserList extends Component {
 function UserListWithNavigate() {
     const navigateTo = useNavigate()
     const socket = useSocket()
-
+    const params = useParams()
     useEffect(()=>{
         const handleCallAccepted = (data) => {
             alert(`call accepted by ${data.email}`)
@@ -77,20 +77,32 @@ function UserListWithNavigate() {
             console.log(data)
             const cnf = window.confirm(`call received from ${data.email}`)
             if (cnf) {
+                //send peer data here
                 socket.emit("accepted", {email: data.email})
             } else {
-    
+                socket.emit("rejected", {
+                    email: data.email
+                })
             }
+        }
+        const handleCallRejected = (data)=>{
+            alert(`call is rejected by ${data.email}`)
         }
         socket.on("callReceived",handleCallReceived)
         socket.on("callaccepted", handleCallAccepted)
+        socket.on("callRejected", handleCallRejected)
         return () => {
             socket.off("callReceived", handleCallReceived)
             socket.off("callaccepted",handleCallAccepted)
+            socket.off("callRejected", handleCallRejected)
         }
-    },[])
-    return(
+    })
+    return( 
+    <>
+        <h1>This is {params.userId}</h1>
         <UserList navigateTo = {navigateTo} socket = {socket}/>
+    </>
+        
     )
 }
 

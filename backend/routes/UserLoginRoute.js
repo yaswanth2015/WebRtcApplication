@@ -30,7 +30,8 @@ router
             email: user.email
         }, SECRET_KEY)
         return res.status(200).json({
-            token: token
+            token: token,
+            name: user.name,
         })
     })
 

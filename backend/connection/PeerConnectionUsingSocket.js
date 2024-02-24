@@ -40,10 +40,13 @@ async function handelUserConnectedToSocket(socket) {
         })
     })
 
-    socket.on("rejected",(data) => {
-        socket.broadcast.to(User.findOne({
+    socket.on("rejected",async (data) => {
+        const user = await User.findOne({
             email: data.email
-        }))
+        })
+        socket.to(user.socketID).emit("callRejected", {
+            email: socket.user.email
+        })
     })
 }
 

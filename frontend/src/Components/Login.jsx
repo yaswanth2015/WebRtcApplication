@@ -31,7 +31,7 @@ function Login(props) {
             const responseBody = await response.json()
             if (response.status === 200) {
                 localStorage.setItem(Constants.TOKEN_KEY,responseBody.token)
-                navigate("/users")
+                navigate(`/${responseBody.name}`)
             } else {
                 alert(responseBody.error)
             }
