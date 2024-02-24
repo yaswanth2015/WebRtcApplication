@@ -4,13 +4,18 @@ const User = require("../model/User")
 async function handelUserConnectedToSocket(socket) {
     const email = socket.user.email
     const name = socket.user.name
-    User.findOneAndUpdate({
+    const user = await User.findOneAndUpdate({
         email: email
     }, {
         socketID: socket.id
     })
     console.log(`${socket.user.name} is connected to socket`)
-    socket.on("disconnect", (data) => {
+    socket.on("disconnect", async (data) => {
+        const user = await User.findOneAndUpdate({
+            email: socket.user.email,
+        }, {
+            socketID: null
+        })
         console.log(`${socket.user.name} is disconnected from socket`)
     })
 

@@ -8,8 +8,11 @@ const bodyParser =  require("body-parser")
 const JWT = require("jsonwebtoken")
 const { decode } = require("punycode")
 const SECRET_KEY = "WEB_RTC"
+const cors = require('cors');
 const app = express()
-const socketServer = new Server(createServer())
+const socketServer = new Server(createServer(), {
+    cors: true,
+})
 const handelUserConnectedToSocket = require("./connection/PeerConnectionUsingSocket")
 const SOCKETPORT = 8001
 const APIPORT = 8000
@@ -20,6 +23,7 @@ connectToDatabase("mongodb://127.0.0.1:27017/webrtcapplication")
 
 
 // ####### Assign MiddleWares #######
+app.use(cors())
 app.use(bodyParser.json())
 app.use((_req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -43,6 +47,7 @@ app.use(async (req,res,next) => {
         console.log(decode)
         next()
     })
+
 })
 app.use("",UserRoutes)
 
@@ -51,15 +56,15 @@ app.use("",UserRoutes)
 // ####### Handle Connections  #######
 
     // ###### Add MiddleWares for Socket #######
-socketServer.use(async (socket,next) => {
-    JWT.verify(socket.auth.token, SECRET_KEY, (error,decode) => {
-        if (error) {
-            next(new Error("Invalid token"))
-            return
-        }
-        socket.user = decode
+socketServer.use((socket,next) => {
+    const verify = JWT.verify(socket.handshake.auth.token, SECRET_KEY)
+    next()
+    if(!verify) {
+        next(new Error("Invalid Token"))
+    } else {
+        socket.user = verify
         next()
-    })
+    }
 })
 
 

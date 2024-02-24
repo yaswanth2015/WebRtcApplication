@@ -1,15 +1,17 @@
 
 import React from "react";
-import TextField from "./TextField"
+import TextField from "./partial/TextField"
 import "../Css/Login.css"
-import Button from "./Button"
+import Button from "./partial/Button"
 import { useContext } from "react";
 import { UserLoginContext } from "../context/UserLogin"
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import * as Constants from '../constants/ConstantKeys'
 
 function Login(props) {
     const userDetails = useContext(UserLoginContext)
-    const navigate = useNavigate
+    const navigate = useNavigate()
+    localStorage.removeItem(Constants.TOKEN_KEY)
     function handleLogin(e) {
         const userEmail = userDetails.email;
         const userPassword = userDetails.password
@@ -27,8 +29,9 @@ function Login(props) {
         }).then(async (response) => {
             console.log(response)
             const responseBody = await response.json()
-            if (response.status == 200) {
-                alert(responseBody.token)
+            if (response.status === 200) {
+                localStorage.setItem(Constants.TOKEN_KEY,responseBody.token)
+                navigate("/users")
             } else {
                 alert(responseBody.error)
             }

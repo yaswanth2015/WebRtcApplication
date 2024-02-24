@@ -1,7 +1,7 @@
 import React from "react";
-import TextField from "./TextField"
+import TextField from "./partial/TextField"
 import "../Css/Login.css"
-import Button from "./Button";
+import Button from "./partial/Button";
 import { useContext } from "react";
 import { UserSignUpContext } from "../context/UserLogin";
 import { useNavigate } from "react-router-dom";
@@ -27,13 +27,16 @@ function SignUp() {
         }
     }
 
+    function resetValues() {
+        userSignupDetails.setEmail("")
+        userSignupDetails.setPassword("")
+        userSignupDetails.setName("")
+    }
+
     function handleSignUp(e) {
         const email = userSignupDetails.email
         const password = userSignupDetails.password
         const name = userSignupDetails.name
-        console.log(email)
-        console.log(password)
-        console.log(name)
         fetch(`http://${window.location.hostname}:8000/signup`, {
             method: "POST",
             headers: {
@@ -47,25 +50,19 @@ function SignUp() {
             })
         }).then(async (response) => {
             const responseBody = await response.json()
-            if(response.status == 201) {
+            if(response.status === 201) {
                 alert(responseBody.message)
-                userSignupDetails.setEmail("")
-                userSignupDetails.setPassword("")
-                userSignupDetails.setName("")
+                resetValues()
                 navigate("/")
             } else {
                 alert(responseBody.error)
-                userSignupDetails.setEmail("")
-                userSignupDetails.setPassword("")
-                userSignupDetails.setName("")
+                resetValues()
             }
             
         }).catch((error)=>{
             console.log(error)
             alert(`error occured ${error} status ${error.status}`)
-            userSignupDetails.setEmail("")
-            userSignupDetails.setPassword("")
-            userSignupDetails.setName("")
+            resetValues()
         })
 
     }
