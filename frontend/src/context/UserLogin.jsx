@@ -12,3 +12,16 @@ export const UserLoginProvider = (props) => {
         </UserLoginContext.Provider>
     )
 }
+
+export const UserSignUpContext = createContext(null)
+
+export const UserSignUpProvider = (props) => {
+    const [email, setEmail] = useState(null)
+    const [password, setPassword] = useState(null)
+    const [name, setName] = useState(null)
+    return (
+        <UserSignUpContext.Provider value={{email, setEmail, password, setPassword,name, setName }}>
+            {props.children}
+        </UserSignUpContext.Provider>
+    )
+}

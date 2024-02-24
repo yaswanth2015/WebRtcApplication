@@ -38,6 +38,7 @@ router
     .route("/signup")
     .post(async (req,res) => {
         const body = req.body
+        console.log(body)
         const email = body.email
         const name = body.name
         const password = body.password

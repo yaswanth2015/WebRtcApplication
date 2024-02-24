@@ -5,10 +5,11 @@ import "../Css/Login.css"
 import Button from "./Button"
 import { useContext } from "react";
 import { UserLoginContext } from "../context/UserLogin"
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 
 function Login(props) {
     const userDetails = useContext(UserLoginContext)
+    const navigate = useNavigate
     function handleLogin(e) {
         const userEmail = userDetails.email;
         const userPassword = userDetails.password
@@ -25,10 +26,9 @@ function Login(props) {
             })
         }).then(async (response) => {
             console.log(response)
-            console.log(window)
             const responseBody = await response.json()
             if (response.status == 200) {
-                alert(responseBody.message)
+                alert(responseBody.token)
             } else {
                 alert(responseBody.error)
             }
@@ -49,11 +49,15 @@ function Login(props) {
             userDetails.setPassword(e.target.value)
         }
     }
+    function handleNavigation(e) {
+        navigate("/signup") 
+    }
     return (
         <div className="Login">
             <TextField type = "email" placeholder="User Email" value= { userDetails.email } onChange = {handleUserDetails}/>
             <TextField type = "password" placeholder = "Password" value= { userDetails.password } onChange = {handleUserDetails}/>
             <Button buttonName = "Login" onClick = { handleLogin }/>
+            <Button buttonName="Go To SignUp" onClick = { handleNavigation } />
         </div>
     )
 }

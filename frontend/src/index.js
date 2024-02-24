@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import { UserLoginProvider } from "./context/UserLogin.jsx"
+import { UserLoginProvider, UserSignUpProvider } from "./context/UserLogin.jsx"
 import { UserListProvider } from './context/UserList';
 import reportWebVitals from './reportWebVitals';
 
@@ -11,7 +11,9 @@ root.render(
   <React.StrictMode>
     <UserListProvider>
     <UserLoginProvider>
+      <UserSignUpProvider>
       <App />
+      </UserSignUpProvider>
     </UserLoginProvider>
     </UserListProvider>
   </React.StrictMode>

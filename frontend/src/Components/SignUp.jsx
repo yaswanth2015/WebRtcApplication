@@ -2,15 +2,82 @@ import React from "react";
 import TextField from "./TextField"
 import "../Css/Login.css"
 import Button from "./Button";
+import { useContext } from "react";
+import { UserSignUpContext } from "../context/UserLogin";
+import { useNavigate } from "react-router-dom";
 
 
-function signUp() {
+function SignUp() {
+    const userSignupDetails = useContext(UserSignUpContext)
+    const navigate = useNavigate()
+    function handleUserDetails(e) {
+        console.log(e.target.id)
+        switch (e.target.id) {
+            case "email" :
+                userSignupDetails.setEmail(e.target.value)
+                break;
+            case "password":
+                userSignupDetails.setPassword(e.target.value)
+                break;
+            case "name":
+                userSignupDetails.setName(e.target.value) 
+                break;
+            default:
+                break;
+        }
+    }
+
+    function handleSignUp(e) {
+        const email = userSignupDetails.email
+        const password = userSignupDetails.password
+        const name = userSignupDetails.name
+        console.log(email)
+        console.log(password)
+        console.log(name)
+        fetch(`http://${window.location.hostname}:8000/signup`, {
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            mode: "cors",
+            body: JSON.stringify({
+                email: email,
+                name: name,
+                password: password,
+            })
+        }).then(async (response) => {
+            const responseBody = await response.json()
+            if(response.status == 201) {
+                alert(responseBody.message)
+                userSignupDetails.setEmail("")
+                userSignupDetails.setPassword("")
+                userSignupDetails.setName("")
+                navigate("/")
+            } else {
+                alert(responseBody.error)
+                userSignupDetails.setEmail("")
+                userSignupDetails.setPassword("")
+                userSignupDetails.setName("")
+            }
+            
+        }).catch((error)=>{
+            console.log(error)
+            alert(`error occured ${error} status ${error.status}`)
+            userSignupDetails.setEmail("")
+            userSignupDetails.setPassword("")
+            userSignupDetails.setName("")
+        })
+
+    }
     return (
         <div className="Login">
-            <TextField />
-            <TextField />
-            <TextField />
-            <Button />
+            <TextField id="email" type="email" placeholder="Enter Email" value = {userSignupDetails.email} onChange = {handleUserDetails}/>
+            <TextField id="name" type="text" placeholder="Enter name" value = {userSignupDetails.name} onChange = {handleUserDetails}/>
+            <TextField id="password" type="password" placeholder="Enter password" value = {userSignupDetails.password} onChange = {handleUserDetails}/>
+            <Button buttonName = "SignUp" onClick = {handleSignUp}/>
         </div>
     )
 }
+
+
+export default SignUp

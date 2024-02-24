@@ -6,7 +6,7 @@ import '../Css/TextField.css'
 
 function TextField(props) {
     return (
-        <input className='TextField' type={props.type} placeholder = {props.placeholder} value = {props.value} onChange = {props.onChange}></input>
+        <input id={props.id} className='TextField' type={props.type} placeholder = {props.placeholder} value = {props.value} onChange = {props.onChange}></input>
     )
 }
 
