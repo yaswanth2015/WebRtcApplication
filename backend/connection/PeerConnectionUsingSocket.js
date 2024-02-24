@@ -10,6 +10,7 @@ async function handelUserConnectedToSocket(socket) {
         socketID: socket.id
     })
     console.log(`${socket.user.name} is connected to socket`)
+
     socket.on("disconnect", async (data) => {
         const user = await User.findOneAndUpdate({
             email: socket.user.email,
@@ -20,18 +21,22 @@ async function handelUserConnectedToSocket(socket) {
     })
 
     //data should contain email
-    socket.on("call", (data) => {
-        socket.broadcast.to(User.findOne({
+    socket.on("call",async (data) => {
+        const user = await User.findOne({
             email: data.email
-        }).socketID).emit("callReceived", {
-            email: email
+        })
+        socket.broadcast.to(user.socketID).emit("callReceived", {
+            email: socket.user.email
         })
     })
 
-    socket.on("accepted", (data)=>{
-        socket.broadcast.to(User.findOne({
+    socket.on("accepted",async (data)=>{
+        const user = await User.findOne({
             email: data.email
-        })).emit("callaccepted", data)
+        })
+        socket.broadcast.to(user.socketID).emit("callaccepted", {
+            email: socket.user.email
+        })
     })
 
     socket.on("rejected",(data) => {

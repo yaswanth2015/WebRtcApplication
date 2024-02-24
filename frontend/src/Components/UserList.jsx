@@ -1,8 +1,10 @@
 import React from "react";
+import { useEffect } from "react";
 import { Component } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import * as Constants from '../constants/ConstantKeys'
-import { SocketProvider } from "../context/UserLogin";
+import { SocketProvider, useSocket } from "../context/UserLogin";
+
 
 
 class UserList extends Component {
@@ -39,11 +41,18 @@ class UserList extends Component {
             })
     }
 
+    handleOnClickUser = (e) => {
+        console.log("inside click")
+        this.props.socket.emit("call", {email: e.target.innerText})
+    }
+
     render() {
+        console.log("props are")
+        console.log(this.props)
         return (
             <ul>
                 {this.state.users.map((value)=>{
-                    return <NavLink className="NavLink" to={"/"}> {value.email} </NavLink>
+                    return <button onClick={this.handleOnClickUser}> {value.email} </button>
                 })}
             </ul>
         )
@@ -52,13 +61,34 @@ class UserList extends Component {
 
 function UserListWithNavigate() {
     const navigateTo = useNavigate()
+    const socket = useSocket()
+    useEffect(()=>{
+        socket.once("callReceived", (data) => {
+            console.log(data)
+            const cnf = window.confirm(`call received from ${data.email}`)
+            if (cnf) {
+                socket.emit("accepted", {email: data.email})
+            } else {
+
+            }
+        })
+
+        socket.once("callaccepted", (data) => {
+            alert(`call accepted by ${data.email}`)
+        })
+    })
     return(
-        <SocketProvider>
-            <UserList navigateTo = {navigateTo}/>
-        </SocketProvider>
+        <UserList navigateTo = {navigateTo} socket = {socket}/>
     )
 }
 
-export default UserListWithNavigate
+function UserListWithSocketProvider() {
+    return (
+    <SocketProvider>
+        <UserListWithNavigate />
+    </SocketProvider>)
+}
+
+export default UserListWithSocketProvider
 
 
