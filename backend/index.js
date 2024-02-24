@@ -37,8 +37,6 @@ app.use("", userLoginRouter)
 // Adding Security
 app.use(async (req,res,next) => {
     const token = req.headers.token
-    console.log("hello ")
-    console.log(socketServer.listeners())
     JWT.verify(token, SECRET_KEY, (error, decode)=>{
         if(error) {
             return res.status(401).json({
@@ -46,7 +44,6 @@ app.use(async (req,res,next) => {
             })
         }
         req.user = decode
-        console.log(decode)
         next()
     })
 

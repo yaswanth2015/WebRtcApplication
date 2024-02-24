@@ -10,7 +10,6 @@ router
     .post(async (req,res) => {
         const email = req.body.email
         const password = req.body.password
-        console.log("login request")
         if(!email || !password) {
             return res.status(404).json({
                 "error": "user not found"

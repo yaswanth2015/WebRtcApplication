@@ -27,7 +27,6 @@ function Login(props) {
                 password: userPassword,
             })
         }).then(async (response) => {
-            console.log(response)
             const responseBody = await response.json()
             if (response.status === 200) {
                 localStorage.setItem(Constants.TOKEN_KEY,responseBody.token)

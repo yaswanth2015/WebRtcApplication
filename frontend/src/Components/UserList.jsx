@@ -27,7 +27,6 @@ class UserList extends Component {
             }).then(async (response)=>{
                 const userList = await response.json()
                 if (response.status === 200) {
-                    console.log(userList)
                     this.setState({
                         users: userList
                     })
@@ -40,12 +39,10 @@ class UserList extends Component {
                 this.props.navigateTo("/")
             })
             this.props.socket.connect()
-            console.log(`connected`)
+            console.log(`socket connected`)
     }
 
     handleOnClickUser = (e) => {
-        console.log("inside click")
-        
         this.props.socket.emit("call", {email: e.target.innerText})
     }
 
@@ -57,7 +54,7 @@ class UserList extends Component {
         return (<>
             <ul>
                 {this.state.users.map((value)=>{
-                    return <button className="UserButton" onClick={this.handleOnClickUser}> {value.email} </button>
+                    return <button className="UserButton" onClick={this.handleOnClickUser} key = {value.email}> {value.email} </button>
                 })}
             </ul>
             </>
@@ -74,7 +71,7 @@ function UserListWithNavigate() {
             alert(`call accepted by ${data.email}`)
         }
         const handleCallReceived = (data)=>{
-            console.log(data)
+
             const cnf = window.confirm(`call received from ${data.email}`)
             if (cnf) {
                 //send peer data here

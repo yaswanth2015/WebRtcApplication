@@ -7,7 +7,6 @@ const User = require("../model/User")
 router.
     route("/users")
     .get(async (req,res) => {
-        console.log("users requested")
         const allUsers = await User.find({ 
             email: {
                 $ne: req.user.email

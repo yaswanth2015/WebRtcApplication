@@ -11,7 +11,6 @@ function SignUp() {
     const userSignupDetails = useContext(UserSignUpContext)
     const navigate = useNavigate()
     function handleUserDetails(e) {
-        console.log(e.target.id)
         switch (e.target.id) {
             case "email" :
                 userSignupDetails.setEmail(e.target.value)
