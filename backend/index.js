@@ -37,6 +37,8 @@ app.use("", userLoginRouter)
 // Adding Security
 app.use(async (req,res,next) => {
     const token = req.headers.token
+    console.log("hello ")
+    console.log(socketServer.listeners())
     JWT.verify(token, SECRET_KEY, (error, decode)=>{
         if(error) {
             return res.status(401).json({
@@ -58,7 +60,6 @@ app.use("",UserRoutes)
     // ###### Add MiddleWares for Socket #######
 socketServer.use((socket,next) => {
     const verify = JWT.verify(socket.handshake.auth.token, SECRET_KEY)
-    next()
     if(!verify) {
         next(new Error("Invalid Token"))
     } else {
@@ -81,6 +82,8 @@ app.listen(APIPORT, () => {
 })
 
 socketServer.listen(SOCKETPORT)
+
+
 
 
 

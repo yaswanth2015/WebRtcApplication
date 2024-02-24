@@ -36,7 +36,8 @@ export const SocketProvider = (props) => {
     const socket = useMemo(() => io(`http://${window.location.hostname}:8001`, {
         auth: {
             token: localStorage.getItem(Constants.TOKEN_KEY)
-        }
+        },
+        autoConnect: false
     }),[])
     return (
         <SocketContext.Provider value = { socket }>

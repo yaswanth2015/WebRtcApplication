@@ -1,9 +1,11 @@
 import React from "react";
+import { useCallback } from "react";
 import { useEffect } from "react";
 import { Component } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import * as Constants from '../constants/ConstantKeys'
 import { SocketProvider, useSocket } from "../context/UserLogin";
+import "../Css/UserButton.css"
 
 
 
@@ -24,7 +26,6 @@ class UserList extends Component {
                 },
                 mode: 'cors',
             }).then(async (response)=>{
-                console.log(response)
                 const userList = await response.json()
                 if (response.status === 200) {
                     console.log(userList)
@@ -39,20 +40,25 @@ class UserList extends Component {
                 alert(`Error occured please try again ${error}`)
                 this.props.navigateTo("/")
             })
+            this.props.socket.connect()
+            console.log(`connected`)
     }
 
     handleOnClickUser = (e) => {
         console.log("inside click")
+        
         this.props.socket.emit("call", {email: e.target.innerText})
     }
 
+    componentWillUnmount() {
+        this.props.socket.disconnect()
+    }
+
     render() {
-        console.log("props are")
-        console.log(this.props)
         return (
             <ul>
                 {this.state.users.map((value)=>{
-                    return <button onClick={this.handleOnClickUser}> {value.email} </button>
+                    return <button className="UserButton" onClick={this.handleOnClickUser}> {value.email} </button>
                 })}
             </ul>
         )
@@ -62,25 +68,33 @@ class UserList extends Component {
 function UserListWithNavigate() {
     const navigateTo = useNavigate()
     const socket = useSocket()
+
     useEffect(()=>{
-        socket.once("callReceived", (data) => {
+        const handleCallAccepted = (data) => {
+            alert(`call accepted by ${data.email}`)
+        }
+        const handleCallReceived = (data)=>{
             console.log(data)
             const cnf = window.confirm(`call received from ${data.email}`)
             if (cnf) {
                 socket.emit("accepted", {email: data.email})
             } else {
-
+    
             }
-        })
-
-        socket.once("callaccepted", (data) => {
-            alert(`call accepted by ${data.email}`)
-        })
-    })
+        }
+        socket.on("callReceived",handleCallReceived)
+        socket.on("callaccepted", handleCallAccepted)
+        return () => {
+            socket.off("callReceived", handleCallReceived)
+            socket.off("callaccepted",handleCallAccepted)
+        }
+    },[])
     return(
         <UserList navigateTo = {navigateTo} socket = {socket}/>
     )
 }
+
+
 
 function UserListWithSocketProvider() {
     return (

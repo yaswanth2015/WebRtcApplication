@@ -25,7 +25,8 @@ async function handelUserConnectedToSocket(socket) {
         const user = await User.findOne({
             email: data.email
         })
-        socket.broadcast.to(user.socketID).emit("callReceived", {
+        console.log(`call from ${socket.user.email} to ${data.email}`)
+        socket.to(user.socketID).emit("callReceived", {
             email: socket.user.email
         })
     })
@@ -34,7 +35,7 @@ async function handelUserConnectedToSocket(socket) {
         const user = await User.findOne({
             email: data.email
         })
-        socket.broadcast.to(user.socketID).emit("callaccepted", {
+        socket.to(user.socketID).emit("callaccepted", {
             email: socket.user.email
         })
     })
