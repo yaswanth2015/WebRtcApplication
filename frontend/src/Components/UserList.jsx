@@ -1,10 +1,14 @@
 import React from "react";
+import { useState } from "react";
 import { useEffect } from "react";
 import { Component } from "react";
+import ReactPlayer from "react-player";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Constants from '../constants/ConstantKeys'
 import { SocketProvider, useSocket } from "../context/UserLogin";
 import "../Css/UserButton.css"
+import Button from "./partial/Button";
+import Streaming from "./partial/Streaming";
 
 
 
@@ -16,12 +20,13 @@ class UserList extends Component {
         }
     }
 
-    componentDidMount() {
+    fetchDetails = () => {
         fetch(`http://${window.location.hostname}:8000/users`, {
                 method: "GET",
                 headers: {
                     'content-type':"application/json",
-                    token: localStorage.getItem(Constants.TOKEN_KEY)
+                    token: localStorage.getItem(Constants.TOKEN_KEY),
+                    name: this.props.userId
                 },
                 mode: 'cors',
             }).then(async (response)=>{
@@ -30,6 +35,7 @@ class UserList extends Component {
                     this.setState({
                         users: userList
                     })
+                    this.props.socket.connect()
                 } else {
                     alert(`user is not authorized please login from login screen`)
                     this.props.navigateTo("/")
@@ -38,15 +44,48 @@ class UserList extends Component {
                 alert(`Error occured please try again ${error}`)
                 this.props.navigateTo("/")
             })
-            this.props.socket.connect()
-            console.log(`socket connected`)
+    }
+
+    handleCallAccepted = async (data) => {
+        alert(`call accepted by ${data.email}`)
+    }
+    handleCallReceived = (data)=>{
+        const cnf = window.confirm(`call received from ${data.email}`)
+        if (cnf) {
+            this.props.socket.emit("accepted", {email: data.email})
+        } else {
+            this.props.socket.emit("rejected", {
+                email: data.email
+            })
+        }
+    }
+    handleCallRejected = (data)=>{
+        alert(`call is rejected by ${data.email}`)
+    }
+    handleUserJoined = (data)=>{
+        window.alert(`User Joined Please refresh the screen`)
+    }
+
+    setUpSockets() {
+        
+        this.props.socket.on("callReceived",this.handleCallReceived)
+        this.props.socket.on("callaccepted", this.handleCallAccepted)
+        this.props.socket.on("callRejected", this.handleCallRejected)
+    }
+
+    componentDidMount() {
+        this.fetchDetails()
+        this.setUpSockets()
     }
 
     handleOnClickUser = (e) => {
-        this.props.socket.emit("call", {email: e.target.innerText})
+        this.props.socket.emit("call", {email: e.target.innerText, })
     }
 
     componentWillUnmount() {
+        this.props.socket.off("callReceived",this.handleCallReceived)
+        this.props.socket.off("callaccepted", this.handleCallAccepted)
+        this.props.socket.off("callRejected", this.handleCallRejected)
         this.props.socket.disconnect()
     }
 
@@ -54,7 +93,7 @@ class UserList extends Component {
         return (<>
             <ul>
                 {this.state.users.map((value)=>{
-                    return <button className="UserButton" onClick={this.handleOnClickUser} key = {value.email}> {value.email} </button>
+                    return <Button class = "btn btn-link" buttonName = {value.email} onClick = {this.handleOnClickUser}/>
                 })}
             </ul>
             </>
@@ -66,38 +105,10 @@ function UserListWithNavigate() {
     const navigateTo = useNavigate()
     const socket = useSocket()
     const params = useParams()
-    useEffect(()=>{
-        const handleCallAccepted = (data) => {
-            alert(`call accepted by ${data.email}`)
-        }
-        const handleCallReceived = (data)=>{
-
-            const cnf = window.confirm(`call received from ${data.email}`)
-            if (cnf) {
-                //send peer data here
-                socket.emit("accepted", {email: data.email})
-            } else {
-                socket.emit("rejected", {
-                    email: data.email
-                })
-            }
-        }
-        const handleCallRejected = (data)=>{
-            alert(`call is rejected by ${data.email}`)
-        }
-        socket.on("callReceived",handleCallReceived)
-        socket.on("callaccepted", handleCallAccepted)
-        socket.on("callRejected", handleCallRejected)
-        return () => {
-            socket.off("callReceived", handleCallReceived)
-            socket.off("callaccepted",handleCallAccepted)
-            socket.off("callRejected", handleCallRejected)
-        }
-    })
     return( 
     <>
         <h1>This is {params.userId}</h1>
-        <UserList navigateTo = {navigateTo} socket = {socket}/>
+        <UserList navigateTo = {navigateTo} socket = {socket} userId={params.userId}/>
     </>
         
     )

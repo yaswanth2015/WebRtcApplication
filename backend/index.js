@@ -38,7 +38,7 @@ app.use("", userLoginRouter)
 app.use(async (req,res,next) => {
     const token = req.headers.token
     JWT.verify(token, SECRET_KEY, (error, decode)=>{
-        if(error) {
+        if(error || req.headers.name !== decode.name) {
             return res.status(401).json({
                 "error":"Invalid Token"
             })
@@ -68,6 +68,7 @@ socketServer.use((socket,next) => {
 
 socketServer.on("connection", (socket) =>{
     console.log(`User Connected`)
+    socketServer.emit('userjoined')
     handelUserConnectedToSocket(socket)
 })
 

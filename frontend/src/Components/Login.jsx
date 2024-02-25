@@ -58,8 +58,8 @@ function Login(props) {
         <div className="Login">
             <TextField type = "email" placeholder="User Email" value= { userDetails.email } onChange = {handleUserDetails}/>
             <TextField type = "password" placeholder = "Password" value= { userDetails.password } onChange = {handleUserDetails}/>
-            <Button buttonName = "Login" onClick = { handleLogin }/>
-            <Button buttonName="Go To SignUp" onClick = { handleNavigation } />
+            <Button className = "CustomButton" buttonName = "Login" onClick = { handleLogin }/>
+            <Button className = "CustomButton" buttonName="Go To SignUp" onClick = { handleNavigation } />
         </div>
     )
 }

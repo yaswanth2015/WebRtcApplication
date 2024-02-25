@@ -4,7 +4,7 @@ import "../../Css/Button.css"
 
 function Button(props) {
     return (
-        <button className="CustomButton" onClick={props.onClick}>{props.buttonName}</button>
+        <button class = {props.class} className={props.className} onClick={props.onClick}>{props.buttonName}</button>
     )
 }
 

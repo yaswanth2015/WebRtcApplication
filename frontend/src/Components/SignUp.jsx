@@ -70,7 +70,7 @@ function SignUp() {
             <TextField id="email" type="email" placeholder="Enter Email" value = {userSignupDetails.email} onChange = {handleUserDetails}/>
             <TextField id="name" type="text" placeholder="Enter name" value = {userSignupDetails.name} onChange = {handleUserDetails}/>
             <TextField id="password" type="password" placeholder="Enter password" value = {userSignupDetails.password} onChange = {handleUserDetails}/>
-            <Button buttonName = "SignUp" onClick = {handleSignUp}/>
+            <Button className = "CustomButton" buttonName = "SignUp" onClick = {handleSignUp}/>
         </div>
     )
 }
