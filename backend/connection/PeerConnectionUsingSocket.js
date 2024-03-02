@@ -27,16 +27,18 @@ async function handelUserConnectedToSocket(socket) {
         })
         console.log(`call from ${socket.user.email} to ${data.email}`)
         socket.to(user.socketID).emit("callReceived", {
-            email: socket.user.email
+            email: socket.user.email,
+            offer: data.offer,
         })
     })
 
-    socket.on("accepted",async (data)=>{
+    socket.on("accepted", async (data)=>{
         const user = await User.findOne({
             email: data.email
         })
         socket.to(user.socketID).emit("callaccepted", {
-            email: socket.user.email
+            email: socket.user.email,
+            answer: data.answer,
         })
     })
 
@@ -49,6 +51,4 @@ async function handelUserConnectedToSocket(socket) {
         })
     })
 }
-
-
 module.exports = handelUserConnectedToSocket

@@ -4,14 +4,17 @@ import './index.css';
 import App from './App';
 import { UserLoginProvider, UserSignUpProvider } from "./context/UserLogin.jsx"
 import reportWebVitals from './reportWebVitals';
+import { PeerProvider } from './context/Peer';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <UserLoginProvider>
-      <UserSignUpProvider>
-      <App />
-      </UserSignUpProvider>
-    </UserLoginProvider>
+    <PeerProvider>
+      <UserLoginProvider>
+          <UserSignUpProvider>
+            <App />
+          </UserSignUpProvider>
+      </UserLoginProvider>
+    </PeerProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -4,6 +4,7 @@ import Login from './Components/Login';
 import SignUp from './Components/SignUp'
 import UserListWithSocketProvider from './Components/UserList';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import Chat from './Components/Chat';
 
 
 function App() {
@@ -13,7 +14,10 @@ function App() {
         <Routes>
           <Route path='/' element = {<Login />}/>
           <Route path='/signup' element = { <SignUp /> }/>
-          <Route path="/:userId" element = { <UserListWithSocketProvider /> } />
+          <Route path="/:userId" >
+            <Route path = "" element = { <UserListWithSocketProvider /> } />
+            <Route path = "connect" element = {<Chat />}/>
+          </Route>
           <Route path='/login' element = {<Navigate to={"/"}/>} />
         </Routes>
       </BrowserRouter>
