@@ -5,7 +5,8 @@ import * as Constants from '../constants/ConstantKeys'
 import { SocketProvider, useSocket } from "../context/UserLogin";
 import "../Css/UserButton.css"
 import Button from "./partial/Button";
-import { usePeerConnection } from "../context/Peer";
+import { PeerProvider, usePeerConnection } from "../context/Peer";
+import ReactPlayer from 'react-player'
 
 
 
@@ -45,24 +46,31 @@ class UserList extends Component {
 
     handleCallAccepted = async (data) => {
         alert(`call accepted by ${data.email}`)
-        this.props.peer.setLocalDescription(data.answer).then((val) => {
-            this.props.navigateTo(`connect`)
+        this.props.peerHelper.setAnswer(data.answer).then((val) => {
+            console.log(this.props.peerHelper)
         }).catch((error)=>{
             console.log(`error occures setting local description answer`)
+            console.log(error)
         })
     }
 
     handleCallReceived = async (data)=>{
         const cnf = window.confirm(`call received from ${data.email}`)
         if (cnf) {
-            this.props.peer.createPeerAnswer(data.offer).then((answer) => {
-                this.props.socket.emit("accepted", {
-                    email: data.email,
-                    answer: answer
+            this.props.peerHelper.startLocalStream().then((stream)=> {
+                this.props.peerHelper.sendLocalStream(stream)
+                this.props.peerHelper.setConnectedEmail(data.email)
+                this.props.peerHelper.createPeerAnswer(data.offer).then((answer) => {
+                    this.props.socket.emit("accepted", {
+                        email: data.email,
+                        answer: answer
+                    })
+                    
+                }).catch((error)=>{
+                    console.log("Error in creating answer")
                 })
-                this.props.navigateTo(`connect`)
             }).catch((error)=>{
-                console.log("Error in creating answer")
+                console.log("Error in starting local stream for answer")
             })
         } else {
             this.props.socket.emit("rejected", {
@@ -91,21 +99,28 @@ class UserList extends Component {
     }
 
     handleOnClickUser = async (e) => {
-        this.props.peer.createPeerOffer().then((Offer)=>{
-            this.props.socket.emit("call", {
-                email: e.target.innerText,
-                offer: Offer
+        this.props.peerHelper.startLocalStream().then((stream) => {
+            this.props.peerHelper.sendLocalStream(stream)
+            this.props.peerHelper.setConnectedEmail(e.target.innerText)
+            console.log(`connected Email ${this.props.peerHelper.connectedEmail}`)
+            this.props.peerHelper.createPeerOffer().then((offer)=>{
+                this.props.peerHelper.setOffer(offer)
+                this.props.socket.emit("call", {
+                    email: e.target.innerText,
+                    offer: offer
+                })
+            }).catch((error) => {
+                console.log(`Error in creating offer`)
+                console.log(error)
             })
-        }).catch((error) => {
-            console.log(`Error in creating offer`)
-        })
+            
+        })  
     }
 
     componentWillUnmount() {
         this.props.socket.off("callReceived", this.handleCallReceived)
         this.props.socket.off("callaccepted", this.handleCallAccepted)
         this.props.socket.off("callRejected", this.handleCallRejected)
-        this.props.socket.disconnect()
     }
 
     render() {
@@ -118,6 +133,14 @@ class UserList extends Component {
                         })
                     }
                 </ul>
+                <h1>Below is local user</h1>
+                {
+                    this.props.peerHelper.localStream && <ReactPlayer muted url={this.props.peerHelper.localStream} height = "300px" width="300px" playing/>
+                }
+                <h1> below is Remote user </h1>
+                {
+                    this.props.peerHelper.remoteStream && <ReactPlayer muted url={this.props.peerHelper.remoteStream} height = "300px" width="300px" playing/>
+                }
             </>
         )
     }
@@ -127,11 +150,11 @@ function UserListWithNavigate() {
     const navigateTo = useNavigate()
     const socket = useSocket()
     const params = useParams()
-    const peer = usePeerConnection()
+    const peerHelper = usePeerConnection()
     return( 
     <>
         <h1>This is {params.userId}</h1>
-        <UserList navigateTo = {navigateTo} socket = {socket} userId={params.userId} peer = {peer}/>
+        <UserList navigateTo = {navigateTo} socket = {socket} userId={params.userId} peerHelper = {peerHelper}/>
     </>
         
     )
@@ -142,7 +165,9 @@ function UserListWithNavigate() {
 function UserListWithSocketProvider() {
     return (
     <SocketProvider>
+        <PeerProvider>
         <UserListWithNavigate />
+        </PeerProvider>
     </SocketProvider>)
 }
 

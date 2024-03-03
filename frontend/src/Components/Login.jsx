@@ -28,10 +28,12 @@ function Login(props) {
             })
         }).then(async (response) => {
             const responseBody = await response.json()
+            console.log(responseBody)
             if (response.status === 200) {
                 localStorage.setItem(Constants.TOKEN_KEY,responseBody.token)
                 navigate(`/${responseBody.name}`)
             } else {
+                console.log(response.status)
                 alert(responseBody.error)
             }
             userDetails.setEmail("")
